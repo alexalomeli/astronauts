@@ -8,6 +8,10 @@ import requests
 # Make a request to the People in Space API and retrieve the response
 response = requests.get("http://api.open-notify.org/astros.json")
 
+#Add a title
+
+st.title("People in space")
+
 # Convert the response data from JSON to a Python dictionary
 data = json.loads(response.text)
 
@@ -23,5 +27,34 @@ st.write("Astronauts names:")
 for name in astronauts_names:
     st.write(name)
 
+def get_iss_location():
+    url = "http://api.open-notify.org/iss-now.json"
+    response = requests.get(url)
+    data = response.json()
+    if data["message"] == "success":
+        latitude = float(data["iss_position"]["latitude"])
+        longitude = float(data["iss_position"]["longitude"])
+        return latitude, longitude
+    else:
+        return None
+
+def main():
+    st.title("International Space Station Tracker")
+    st.write("This app tracks the current location of the ISS.")
+
+    # Fetch ISS location
+    location = get_iss_location()
+    if location:
+        latitude, longitude = location
+        df = pd.DataFrame({"LATITUDE": [latitude], "LONGITUDE": [longitude]})
+        st.write("Current Latitude:", latitude)
+        st.write("Current Longitude:", longitude)
+        st.map(df)
+
+    # Add a short description for the map
+    st.write("Map showing the current location of the International Space Station.")
+
+if __name__ == "__main__":
+    main()
 
 
